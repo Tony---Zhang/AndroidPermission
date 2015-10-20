@@ -26,6 +26,12 @@ public class MainActivityWithPermissionsDispatcher extends Activity {
         MainActivityWithPermissionsDispatcherPermissionsDispatcher.insertContactWithCheck(this);
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        // delegate the permission handling to generated method
+        MainActivityWithPermissionsDispatcherPermissionsDispatcher.onRequestPermissionsResult(this, requestCode, grantResults);
+    }
+
     @NeedsPermission(Manifest.permission.WRITE_CONTACTS)
     void insertContact() {
         insertDummyContact(this);
@@ -33,19 +39,6 @@ public class MainActivityWithPermissionsDispatcher extends Activity {
 
     @ShowsRationale(Manifest.permission.WRITE_CONTACTS)
     void showRationaleForWriteContact() {
-//        new AlertDialog.Builder(this)
-//                .setMessage("You need to allow access to Contacts")
-//                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-//                    @Override
-//                    public void onClick(DialogInterface dialog, int which) {
-//                        MainActivityWithPermissionsDispatcherPermissionsDispatcher
-//                                .insertContactWithCheck(MainActivityWithPermissionsDispatcher.this);
-//                        dialog.dismiss();
-//                    }
-//                })
-//                .setNegativeButton(android.R.string.cancel, null)
-//                .create()
-//                .show();
         Toast.makeText(this, "We WRITE_CONTACTS Permission to write contact", Toast.LENGTH_SHORT).show();
     }
 

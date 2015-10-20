@@ -7,14 +7,12 @@ import android.widget.Toast;
 
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import rx.Observable;
 import rx.functions.Action1;
+import rx.functions.Func1;
 
 import static com.thoughtworks.mpermission.Utils.ContactUtils.insertDummyContact;
 
-/**
- * No shouldShowRequestPermissionRationale support
- * https://github.com/tbruyelle/RxPermissions/issues/8
- */
 public class MainActivityWithRXPermission extends Activity {
 
     @Override
@@ -22,9 +20,19 @@ public class MainActivityWithRXPermission extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_activity_with_rxpermission);
 
-        RxPermissions rxPermissions = RxPermissions.getInstance(this);
-        rxPermissions
-                .request(Manifest.permission.WRITE_CONTACTS)
+        final RxPermissions rxPermissions = RxPermissions.getInstance(this);
+        rxPermissions.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_CONTACTS)
+                .flatMap(new Func1<Boolean, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Boolean should) {
+                        if (should) {
+                            // User already denied the permission, but didn't
+                            // checked "never ask again".
+                            showRationaleForWriteContact();
+                        }
+                        return rxPermissions.request(Manifest.permission.WRITE_CONTACTS);
+                    }
+                })
                 .subscribe(new Action1<Boolean>() {
                     @Override
                     public void call(Boolean granted) {
@@ -36,6 +44,10 @@ public class MainActivityWithRXPermission extends Activity {
                         }
                     }
                 });
+    }
+
+    void showRationaleForWriteContact() {
+        Toast.makeText(this, "We WRITE_CONTACTS Permission to write contact", Toast.LENGTH_SHORT).show();
     }
 
     void showDeniedForWriteContact() {
